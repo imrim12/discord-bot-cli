@@ -1,8 +1,8 @@
 {
-  "name": "discord-bot-cli",
+  "name": "discord-agent-cli",
   "version": "1.0.0",
   "private": false,
-  "description": "Discord Bot CLI with active polling and agent skills",
+  "description": "Discord Bot CLI for AI Agents with active polling and agent skills",
   "type": "module",
   "bin": {
     "discord": "./dist/cli.js"
