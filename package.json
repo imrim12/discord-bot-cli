@@ -1,6 +1,7 @@
 {
   "name": "discord-bot-cli",
   "version": "1.0.0",
+  "private": false,
   "description": "Discord Bot CLI with active polling and agent skills",
   "type": "module",
   "bin": {
@@ -17,7 +18,7 @@
     "bot",
     "agent"
   ],
-  "author": "THECODEORIGIN",
+  "author": "Nguyễn Hữu Nguyên Ý",
   "license": "MIT",
   "dependencies": {
     "@ngrok/ngrok": "^1.7.0",
