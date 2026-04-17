@@ -1,30 +1,58 @@
-# Discord Bot CLI
+# Discord Agent CLI
 
-A command-line interface for managing Discord servers via a bot. Send messages, read history, list channels/members/roles, and poll for new activity with a simple CLI.
+A command-line interface for managing Discord servers through a bot, purpose-built for AI agent integration. Send messages, read history, list channels/members/roles, poll for new activity, and receive interaction events — all from the terminal.
 
-Built for integration with AI agent systems like Paperclip AI.
+Built and maintained by [THECODEORIGIN](https://thecodeorigin.com).
 
-## Prerequisites
+## Why Discord Agent CLI?
 
-- Node.js 20+
-- pnpm 10+
-- A Discord Bot token ([create one here](https://discord.com/developers/applications))
+AI agents need a reliable, scriptable way to interact with Discord. Most Discord libraries are designed for long-running bots with persistent gateway connections. This CLI takes a different approach — lightweight, stateless REST commands that agents can call on demand, plus an active polling mechanism for monitoring channels without a gateway connection.
+
+- **Agent-first design** — JSON output, exit codes, and stateless commands built for automation
+- **Active polling** — no gateway required, just sequential REST pulls on a configurable interval
+- **Webhook receiver** — ngrok-tunneled HTTP server with auto-registration and cleanup
+- **Self-diagnosing** — built-in `doctor` command validates your entire setup in seconds
+- **Zero config resolution** — use `#channel-name` instead of memorizing IDs
 
 ## Installation
 
 ```bash
-git clone <repo-url>
-cd discord-bot-cli
-pnpm install
-pnpm build
+# Install globally from npm
+npm install -g discord-agent-cli
+
+# Or with pnpm
+pnpm add -g discord-agent-cli
+
+# Or run directly with npx
+npx discord-agent-cli status
 ```
 
-### Global install (optional)
+After installation, the `discord` command is available globally.
+
+### Install from source
 
 ```bash
-npm link
-# Now you can use `discord` from anywhere
-discord status
+git clone https://github.com/nickytonline/discord-agent-cli.git
+cd discord-agent-cli
+pnpm install
+pnpm build
+pnpm link --global
+```
+
+## Quick Start
+
+```bash
+# 1. Configure your bot token
+echo "DISCORD_BOT_TOKEN=your-token-here" > .env
+echo "DISCORD_GUILD_ID=your-guild-id" >> .env
+
+# 2. Verify everything works
+discord doctor
+
+# 3. Start using it
+discord channels --type text
+discord send "#general" "Hello from the CLI!"
+discord history "#general" --limit 10
 ```
 
 ## Setup
@@ -33,7 +61,7 @@ discord status
 
 1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
 2. Click **New Application**, name it, and save
-3. Go to **Bot** tab, click **Reset Token**, and copy it
+3. Go to the **Bot** tab, click **Reset Token**, and copy it
 4. Under **Privileged Gateway Intents**, enable:
    - **Server Members Intent** (required for `discord members`)
    - **Message Content Intent** (required to read message text from other users)
@@ -44,7 +72,7 @@ discord status
 
 ### 2. Configure credentials
 
-Create a `.env` file in the project root (or wherever you run the CLI):
+Create a `.env` file in the directory where you run the CLI:
 
 ```bash
 DISCORD_BOT_TOKEN=your-bot-token-here
@@ -55,9 +83,10 @@ DISCORD_POLL_INTERVAL=30
 NGROK_AUTHTOKEN=your-ngrok-authtoken
 ```
 
-Or use `.env.local` for local overrides that take highest priority.
+Or use `.env.local` for local overrides that take the highest priority.
 
 **Credential precedence** (later overrides earlier):
+
 1. Global environment variables
 2. `.env` file
 3. `.env.local` file
@@ -77,22 +106,19 @@ Or use `.env.local` for local overrides that take highest priority.
 discord doctor
 ```
 
-This checks all env vars, validates the token, verifies guild access and permissions, and confirms ngrok is available.
-
-## Usage
-
-```bash
-# If globally linked:
-discord <command> [options]
-
-# Or run directly:
-node dist/cli.js <command> [options]
-
-# Or via pnpm:
-pnpm start <command> [options]
-```
+This checks all env vars, validates the token, verifies guild access and bot permissions, inspects the listen state file, and confirms ngrok is available.
 
 ## Commands
+
+### `discord doctor`
+
+Diagnose environment, credentials, permissions, and state.
+
+```bash
+discord doctor
+```
+
+Checks 16 items: env files, all env vars, token validity, guild access, channel permissions, bot roles, listen state file, and ngrok availability. Exits with code 1 if any critical check fails.
 
 ### `discord status`
 
@@ -149,7 +175,7 @@ discord send "#general" "Agreed!" --reply 9876543210 # Reply to message
 discord send "#bot-status" "All good" --embed        # Rich embed
 ```
 
-Channel names use suffix matching: `#general` matches `💬・general`.
+Channel names use suffix matching: `#general` matches channels like `general`.
 
 ### `discord history`
 
@@ -168,7 +194,7 @@ discord history "#general" --after <id>   # After a specific message
 Add a reaction to a message.
 
 ```bash
-discord react <channelId> <messageId> "👍"
+discord react <channelId> <messageId> "thumbsup"
 ```
 
 ### `discord pins`
@@ -201,6 +227,7 @@ discord listen --reset                  # Clear state, start fresh
 ```
 
 **How it works:**
+
 - First run seeds each channel's last-seen position (no output)
 - Each tick polls every text channel for messages after the last-seen ID
 - State is persisted to `.discord-listen-state.json` across restarts
@@ -214,16 +241,6 @@ discord listen &                        # Run in background
 discord listen --json >> messages.log & # Log to file
 ```
 
-### `discord doctor`
-
-Diagnose environment, credentials, permissions, and state.
-
-```bash
-discord doctor
-```
-
-Checks: env files, all env vars, token validity, guild access, channel permissions, bot roles, listen state file, ngrok availability. Exits with code 1 if any critical check fails.
-
 ### `discord webhook`
 
 Start a local webhook server exposed via ngrok to receive Discord interaction events.
@@ -236,6 +253,7 @@ discord webhook --cleanup        # Clear stale endpoint after a crash
 ```
 
 **How it works:**
+
 1. Starts an HTTP server on the specified port
 2. Creates an ngrok tunnel to expose it publicly
 3. Registers the tunnel URL as the application's Interactions Endpoint on Discord
@@ -262,15 +280,17 @@ discord history "#support" --json --limit 10
 discord send "#support" "Issue resolved, deploying fix now."
 
 # 4. Acknowledge
-discord react <channelId> <messageId> "✅"
+discord react <channelId> <messageId> "white_check_mark"
 ```
 
-See `skills/discord-cli/SKILL.md` for full agent skill documentation.
+The `--json` flag on `history` and `listen` outputs structured JSON suitable for programmatic consumption. The `listen --once` mode is designed for scheduled polling in agent heartbeat loops.
+
+See [`skills/discord-cli/SKILL.md`](skills/discord-cli/SKILL.md) for the full agent skill documentation.
 
 ## Project Structure
 
 ```
-discord-bot-cli/
+discord-agent-cli/
   src/                          # TypeScript source
     cli.ts                      # CLI entrypoint
     lib/
@@ -279,6 +299,7 @@ discord-bot-cli/
       format.ts                 # Table/timestamp formatters
       resolve-channel.ts        # #channel-name resolution
     commands/
+      doctor.ts                 # discord doctor
       status.ts                 # discord status
       guilds.ts                 # discord guilds
       channels.ts               # discord channels
@@ -290,7 +311,6 @@ discord-bot-cli/
       pins.ts                   # discord pins
       threads.ts                # discord threads
       listen.ts                 # discord listen
-      doctor.ts                 # discord doctor
       webhook.ts                # discord webhook
   dist/                         # Compiled output
   skills/
@@ -303,11 +323,38 @@ discord-bot-cli/
 ## Development
 
 ```bash
-pnpm install       # Install dependencies
-pnpm build         # Compile TypeScript to dist/
-pnpm start         # Run CLI (after build)
+git clone https://github.com/nickytonline/discord-agent-cli.git
+cd discord-agent-cli
+pnpm install
+pnpm build
+pnpm start -- status           # Run a command
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on contributing to this project.
+
+## Contributing
+
+We welcome contributions of all kinds — bug reports, feature requests, documentation improvements, and code. Please read our [Contributing Guide](CONTRIBUTING.md) before submitting a pull request.
+
+## Contact
+
+- **Email:** [contact@thecodeorigin.com](mailto:contact@thecodeorigin.com)
+- **Subject format:** `[Discord Agent CLI] <your subject here>`
+
+**Example:**
+
+```
+To: contact@thecodeorigin.com
+Subject: [Discord Agent CLI] Feature request — support for forum channels
+
+Hi,
+
+I'd like to request support for listing and posting in forum channels.
+My use case is ...
+
+Thanks!
 ```
 
 ## License
 
-MIT
+MIT &copy; [THECODEORIGIN](https://thecodeorigin.com)
