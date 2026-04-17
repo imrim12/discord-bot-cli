@@ -1,0 +1,7 @@
+node_modules
+src
+.discord-listen-state.json
+.env
+.env.local
+pnpm-lock.yaml
+tsconfig.json
