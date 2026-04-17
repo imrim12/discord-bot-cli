@@ -1,3 +1,8 @@
+---
+name: discord-cli
+description: Interact with Discord servers from the terminal via the `discord-agent` CLI — send/read messages, list channels/members/roles, react, poll channels for new activity, and run a webhook receiver. Use when the user wants to send a Discord message, read channel history, monitor a server, react to a message, or otherwise drive a Discord bot from an agent/script.
+---
+
 # Discord CLI
 
 A command-line interface for managing Discord servers, channels, messages, and real-time activity monitoring via a Discord Bot.
