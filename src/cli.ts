@@ -18,7 +18,7 @@ import { registerWebhook } from "./commands/webhook.js";
 const program = new Command();
 
 program
-  .name("discord")
+  .name("discord / discord-agent")
   .description(
     "Discord Bot CLI — manage channels, messages, and listen for activity"
   )

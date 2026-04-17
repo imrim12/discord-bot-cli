@@ -16,18 +16,33 @@ AI agents need a reliable, scriptable way to interact with Discord. Most Discord
 
 ## Installation
 
+Install globally with your preferred package manager:
+
 ```bash
-# Install globally from npm
+# npm
 npm install -g discord-agent-cli
 
-# Or with pnpm
+# pnpm
 pnpm add -g discord-agent-cli
 
-# Or run directly with npx
-npx discord-agent-cli status
+# bun
+bun add -g discord-agent-cli
 ```
 
-After installation, the `discord` command is available globally.
+After installation, both `discord` and `discord-agent` commands are available globally. Use whichever you prefer — they are identical.
+
+```bash
+discord status
+# or
+discord-agent status
+```
+
+You can also run it directly without installing:
+
+```bash
+npx discord-agent-cli status
+bunx discord-agent-cli status
+```
 
 ### Install from source
 
@@ -37,6 +52,18 @@ cd discord-agent-cli
 pnpm install
 pnpm build
 pnpm link --global
+```
+
+### Troubleshooting
+
+If global install fails with `EEXIST` or `EPERM` errors, it's usually caused by a stale bin file from a previous install or another package. Fix it by clearing the conflicting file and retrying:
+
+```bash
+# npm
+npm install -g discord-agent-cli --force
+
+# pnpm — if a bin file is locked by a running process, close it first
+pnpm add -g discord-agent-cli --force
 ```
 
 ## Quick Start
