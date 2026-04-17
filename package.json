@@ -9,7 +9,7 @@
     "discord-agent": "./dist/cli.js"
   },
   "scripts": {
-    "build": "tsc",
+    "prepack": "tsc",
     "dev": "node dist/cli.js",
     "start": "node dist/cli.js"
   },
