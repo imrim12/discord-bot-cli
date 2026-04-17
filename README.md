@@ -32,7 +32,7 @@ After installation, the `discord` command is available globally.
 ### Install from source
 
 ```bash
-git clone https://github.com/nickytonline/discord-agent-cli.git
+git clone https://github.com/imrim12/discord-agent-cli.git
 cd discord-agent-cli
 pnpm install
 pnpm build
@@ -63,11 +63,11 @@ discord history "#general" --limit 10
 2. Click **New Application**, name it, and save
 3. Go to the **Bot** tab, click **Reset Token**, and copy it
 4. Under **Privileged Gateway Intents**, enable:
-   - **Server Members Intent** (required for `discord members`)
-   - **Message Content Intent** (required to read message text from other users)
+  - **Server Members Intent** (required for `discord members`)
+  - **Message Content Intent** (required to read message text from other users)
 5. Go to **OAuth2 > URL Generator**:
-   - Scopes: `bot`
-   - Permissions: Read Messages/View Channels, Send Messages, Read Message History, Embed Links, Add Reactions, Attach Files
+  - Scopes: `bot`
+  - Permissions: Read Messages/View Channels, Send Messages, Read Message History, Embed Links, Add Reactions, Attach Files
 6. Open the generated URL to invite the bot to your server
 
 ### 2. Configure credentials
@@ -91,14 +91,16 @@ Or use `.env.local` for local overrides that take the highest priority.
 2. `.env` file
 3. `.env.local` file
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `DISCORD_BOT_TOKEN` | Yes | Bot token from Developer Portal |
-| `DISCORD_GUILD_ID` | No | Default guild ID (avoids `--guild` on every command) |
-| `DISCORD_APPLICATION_ID` | No | Application ID (required for `webhook` command) |
-| `DISCORD_PUBLIC_KEY` | No | Public key hex (required for `webhook` signature verification) |
-| `DISCORD_POLL_INTERVAL` | No | Poll interval in seconds for `listen` (default: 30) |
-| `NGROK_AUTHTOKEN` | No | ngrok auth token (required for `webhook` command, get at https://dashboard.ngrok.com) |
+
+| Variable                 | Required | Description                                                                                                          |
+| ------------------------ | -------- | -------------------------------------------------------------------------------------------------------------------- |
+| `DISCORD_BOT_TOKEN`      | Yes      | Bot token from Developer Portal                                                                                      |
+| `DISCORD_GUILD_ID`       | No       | Default guild ID (avoids `--guild` on every command)                                                                 |
+| `DISCORD_APPLICATION_ID` | No       | Application ID (required for `webhook` command)                                                                      |
+| `DISCORD_PUBLIC_KEY`     | No       | Public key hex (required for `webhook` signature verification)                                                       |
+| `DISCORD_POLL_INTERVAL`  | No       | Poll interval in seconds for `listen` (default: 30)                                                                  |
+| `NGROK_AUTHTOKEN`        | No       | ngrok auth token (required for `webhook` command, get at [https://dashboard.ngrok.com](https://dashboard.ngrok.com)) |
+
 
 ### 3. Verify setup
 
@@ -285,7 +287,7 @@ discord react <channelId> <messageId> "white_check_mark"
 
 The `--json` flag on `history` and `listen` outputs structured JSON suitable for programmatic consumption. The `listen --once` mode is designed for scheduled polling in agent heartbeat loops.
 
-See [`skills/discord-cli/SKILL.md`](skills/discord-cli/SKILL.md) for the full agent skill documentation.
+See `[skills/discord-cli/SKILL.md](skills/discord-cli/SKILL.md)` for the full agent skill documentation.
 
 ## Project Structure
 
