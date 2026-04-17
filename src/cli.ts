@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 import { Command } from "commander";
 import { registerStatus } from "./commands/status.js";
 import { registerGuilds } from "./commands/guilds.js";
@@ -15,6 +18,13 @@ import { registerListen } from "./commands/listen.js";
 import { registerDoctor } from "./commands/doctor.js";
 import { registerWebhook } from "./commands/webhook.js";
 
+const pkg = JSON.parse(
+  readFileSync(
+    join(dirname(fileURLToPath(import.meta.url)), "../package.json"),
+    "utf8"
+  )
+) as { version: string };
+
 const program = new Command();
 
 program
@@ -22,7 +32,7 @@ program
   .description(
     "Discord Bot CLI — manage channels, messages, and listen for activity"
   )
-  .version("1.0.0");
+  .version(pkg.version);
 
 registerStatus(program);
 registerGuilds(program);
