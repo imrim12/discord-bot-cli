@@ -1,0 +1,34 @@
+{
+  "name": "discord-bot-cli",
+  "version": "1.0.0",
+  "description": "Discord Bot CLI with active polling and agent skills",
+  "type": "module",
+  "bin": {
+    "discord": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "node dist/cli.js",
+    "start": "node dist/cli.js"
+  },
+  "keywords": [
+    "discord",
+    "cli",
+    "bot",
+    "agent"
+  ],
+  "author": "THECODEORIGIN",
+  "license": "MIT",
+  "dependencies": {
+    "@ngrok/ngrok": "^1.7.0",
+    "commander": "^14.0.3",
+    "discord.js": "^14.26.3",
+    "dotenv": "^17.4.2",
+    "tweetnacl": "^1.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.8.0"
+  },
+  "packageManager": "pnpm@10.7.0"
+}
