@@ -174,7 +174,7 @@ listen: skip archived channels
 1. **Open an issue first** for non-trivial changes. Discuss the approach before writing code.
 2. **Fork the repo** and create a feature branch from `main`.
 3. **Keep PRs focused.** One feature or fix per PR. Small PRs get reviewed faster.
-4. **Build and test locally** before submitting. Run `discord doctor` and smoke-test your changes against a real Discord server.
+4. **Build and test locally** before submitting. Run `discord-agent doctor` and smoke-test your changes against a real Discord server.
 5. **Update documentation** if your change adds or modifies a command.
 6. **Write a clear PR description** explaining what changed and why.
 
@@ -197,7 +197,7 @@ Open an issue with:
 - **What you expected** to happen
 - **What actually happened** (include error messages and stack traces)
 - **Steps to reproduce**
-- **Output of `discord doctor`**
+- **Output of `discord-agent doctor`**
 - **Environment:** OS, Node.js version, package version
 
 ## Requesting Features

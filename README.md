@@ -16,7 +16,19 @@ AI agents need a reliable, scriptable way to interact with Discord. Most Discord
 
 ## Installation
 
-Install globally with your preferred package manager:
+Requires Node.js `>=18`.
+
+### Run without installing (recommended)
+
+```bash
+npx discord-agent-cli status
+pnpm dlx discord-agent-cli status
+bunx discord-agent-cli status
+```
+
+This avoids global-bin conflicts entirely and always runs the latest version.
+
+### Global install
 
 ```bash
 # npm
@@ -25,23 +37,25 @@ npm install -g discord-agent-cli
 # pnpm
 pnpm add -g discord-agent-cli
 
+# yarn
+yarn global add discord-agent-cli
+
 # bun
 bun add -g discord-agent-cli
 ```
 
-After installation, both `discord` and `discord-agent` commands are available globally. Use whichever you prefer — they are identical.
+This exposes a single `discord-agent` command:
 
 ```bash
-discord status
-# or
 discord-agent status
 ```
 
-You can also run it directly without installing:
+### Local install (per-project)
 
 ```bash
-npx discord-agent-cli status
-bunx discord-agent-cli status
+npm install discord-agent-cli
+# then invoke via your package runner:
+npx discord-agent status
 ```
 
 ### Install from source
@@ -54,17 +68,32 @@ pnpm build
 pnpm link --global
 ```
 
-### Troubleshooting
+### Optional: webhook support
 
-If global install fails with `EEXIST` or `EPERM` errors, it's usually caused by a stale bin file from a previous install or another package. Fix it by clearing the conflicting file and retrying:
+The `discord-agent webhook` command tunnels through ngrok. The `@ngrok/ngrok` native binding is declared as an **optional** dependency — if your platform has no prebuilt binary, install still succeeds; only the `webhook` command will fail with a clear message when run. To enable it explicitly:
 
 ```bash
-# npm
-npm install -g discord-agent-cli --force
-
-# pnpm — if a bin file is locked by a running process, close it first
-pnpm add -g discord-agent-cli --force
+npm install -g @ngrok/ngrok
 ```
+
+### Troubleshooting
+
+**pnpm `EPERM` on Windows.** pnpm rewrites all global bin shims atomically on every global install, so if *any* globally-installed CLI is running (locked file), the whole install aborts — even for an unrelated package. Fix: close other CLI processes and retry, or fall back to npm, or run without installing:
+
+```bash
+# easiest — no global install needed
+pnpm dlx discord-agent-cli status
+
+# or retry after closing other global CLIs
+pnpm add -g discord-agent-cli --force
+
+# or use npm (it doesn't touch other packages' shims)
+npm install -g discord-agent-cli
+```
+
+**`EEXIST` errors.** A stale bin from a previous install. Retry with `--force`, or uninstall first (`npm uninstall -g discord-agent-cli`) and reinstall.
+
+**Native build failures from optional deps.** If `@ngrok/ngrok` fails to install on an unusual platform (Alpine, uncommon arch), the core package still installs successfully thanks to `optionalDependencies`. Only the `webhook` command is affected.
 
 ## Quick Start
 
@@ -74,12 +103,12 @@ echo "DISCORD_BOT_TOKEN=your-token-here" > .env
 echo "DISCORD_GUILD_ID=your-guild-id" >> .env
 
 # 2. Verify everything works
-discord doctor
+discord-agent doctor
 
 # 3. Start using it
-discord channels --type text
-discord send "#general" "Hello from the CLI!"
-discord history "#general" --limit 10
+discord-agent channels --type text
+discord-agent send "#general" "Hello from the CLI!"
+discord-agent history "#general" --limit 10
 ```
 
 ## Setup
@@ -90,7 +119,7 @@ discord history "#general" --limit 10
 2. Click **New Application**, name it, and save
 3. Go to the **Bot** tab, click **Reset Token**, and copy it
 4. Under **Privileged Gateway Intents**, enable:
-  - **Server Members Intent** (required for `discord members`)
+  - **Server Members Intent** (required for `discord-agent members`)
   - **Message Content Intent** (required to read message text from other users)
 5. Go to **OAuth2 > URL Generator**:
   - Scopes: `bot`
@@ -132,127 +161,127 @@ Or use `.env.local` for local overrides that take the highest priority.
 ### 3. Verify setup
 
 ```bash
-discord doctor
+discord-agent doctor
 ```
 
 This checks all env vars, validates the token, verifies guild access and bot permissions, inspects the listen state file, and confirms ngrok is available.
 
 ## Commands
 
-### `discord doctor`
+### `discord-agent doctor`
 
 Diagnose environment, credentials, permissions, and state.
 
 ```bash
-discord doctor
+discord-agent doctor
 ```
 
 Checks 16 items: env files, all env vars, token validity, guild access, channel permissions, bot roles, listen state file, and ngrok availability. Exits with code 1 if any critical check fails.
 
-### `discord status`
+### `discord-agent status`
 
 Show bot identity, connected guilds, and server info.
 
 ```bash
-discord status
+discord-agent status
 ```
 
-### `discord guilds`
+### `discord-agent guilds`
 
 List all servers the bot is a member of.
 
 ```bash
-discord guilds
+discord-agent guilds
 ```
 
-### `discord channels`
+### `discord-agent channels`
 
 List channels in a guild.
 
 ```bash
-discord channels                    # All channels
-discord channels --type text        # Text channels only
-discord channels --type voice       # Voice channels only
-discord channels --guild <id>       # Specific guild
+discord-agent channels                    # All channels
+discord-agent channels --type text        # Text channels only
+discord-agent channels --type voice       # Voice channels only
+discord-agent channels --guild <id>       # Specific guild
 ```
 
-### `discord members`
+### `discord-agent members`
 
 List guild members (requires Server Members Intent).
 
 ```bash
-discord members                     # Default guild
-discord members --limit 50          # Limit results
+discord-agent members                     # Default guild
+discord-agent members --limit 50          # Limit results
 ```
 
-### `discord roles`
+### `discord-agent roles`
 
 List all roles in a guild.
 
 ```bash
-discord roles
+discord-agent roles
 ```
 
-### `discord send`
+### `discord-agent send`
 
 Send a message to a channel.
 
 ```bash
-discord send "#general" "Hello!"                     # By channel name
-discord send 1234567890 "Hello!"                     # By channel ID
-discord send "#general" "Agreed!" --reply 9876543210 # Reply to message
-discord send "#bot-status" "All good" --embed        # Rich embed
+discord-agent send "#general" "Hello!"                     # By channel name
+discord-agent send 1234567890 "Hello!"                     # By channel ID
+discord-agent send "#general" "Agreed!" --reply 9876543210 # Reply to message
+discord-agent send "#bot-status" "All good" --embed        # Rich embed
 ```
 
 Channel names use suffix matching: `#general` matches channels like `general`.
 
-### `discord history`
+### `discord-agent history`
 
 Read message history from a channel.
 
 ```bash
-discord history "#general"                # Last 25 messages
-discord history "#general" --limit 50     # Last 50
-discord history "#general" --full         # No truncation
-discord history "#general" --json         # JSON output
-discord history "#general" --after <id>   # After a specific message
+discord-agent history "#general"                # Last 25 messages
+discord-agent history "#general" --limit 50     # Last 50
+discord-agent history "#general" --full         # No truncation
+discord-agent history "#general" --json         # JSON output
+discord-agent history "#general" --after <id>   # After a specific message
 ```
 
-### `discord react`
+### `discord-agent react`
 
 Add a reaction to a message.
 
 ```bash
-discord react <channelId> <messageId> "thumbsup"
+discord-agent react <channelId> <messageId> "thumbsup"
 ```
 
-### `discord pins`
+### `discord-agent pins`
 
 List pinned messages in a channel.
 
 ```bash
-discord pins "#general"
+discord-agent pins "#general"
 ```
 
-### `discord threads`
+### `discord-agent threads`
 
 List active threads in a guild.
 
 ```bash
-discord threads
+discord-agent threads
 ```
 
-### `discord listen`
+### `discord-agent listen`
 
 Poll all text channels for new messages on a recurring interval.
 
 ```bash
-discord listen                          # Poll every 30s (default)
-discord listen --interval 10            # Poll every 10s
-discord listen --channels <id1>,<id2>   # Watch specific channels
-discord listen --json                   # JSON line output
-discord listen --once                   # Poll once and exit
-discord listen --reset                  # Clear state, start fresh
+discord-agent listen                          # Poll every 30s (default)
+discord-agent listen --interval 10            # Poll every 10s
+discord-agent listen --channels <id1>,<id2>   # Watch specific channels
+discord-agent listen --json                   # JSON line output
+discord-agent listen --once                   # Poll once and exit
+discord-agent listen --reset                  # Clear state, start fresh
 ```
 
 **How it works:**
@@ -266,19 +295,19 @@ discord listen --reset                  # Clear state, start fresh
 **Background usage:**
 
 ```bash
-discord listen &                        # Run in background
-discord listen --json >> messages.log & # Log to file
+discord-agent listen &                        # Run in background
+discord-agent listen --json >> messages.log & # Log to file
 ```
 
-### `discord webhook`
+### `discord-agent webhook`
 
 Start a local webhook server exposed via ngrok to receive Discord interaction events.
 
 ```bash
-discord webhook                  # Default port 8787
-discord webhook --port 3000      # Custom port
-discord webhook --json           # JSON output
-discord webhook --cleanup        # Clear stale endpoint after a crash
+discord-agent webhook                  # Default port 8787
+discord-agent webhook --port 3000      # Custom port
+discord-agent webhook --json           # JSON output
+discord-agent webhook --cleanup        # Clear stale endpoint after a crash
 ```
 
 **How it works:**
@@ -290,7 +319,7 @@ discord webhook --cleanup        # Clear stale endpoint after a crash
 5. All interactions (slash commands, buttons, modals) are logged to stdout
 6. On Ctrl+C: restores the previous endpoint (or clears it), closes ngrok, stops server
 
-**Crash recovery:** If the process gets killed without graceful shutdown, the stale endpoint remains on Discord. Run `discord webhook --cleanup` to clear it.
+**Crash recovery:** If the process gets killed without graceful shutdown, the stale endpoint remains on Discord. Run `discord-agent webhook --cleanup` to clear it.
 
 **Required env vars:** `DISCORD_APPLICATION_ID`, `DISCORD_PUBLIC_KEY`, `NGROK_AUTHTOKEN`
 
@@ -300,16 +329,16 @@ This CLI is designed for AI agents. Typical workflow:
 
 ```bash
 # 1. Check for new messages
-discord listen --once --json
+discord-agent listen --once --json
 
 # 2. Read specific channel
-discord history "#support" --json --limit 10
+discord-agent history "#support" --json --limit 10
 
 # 3. Respond
-discord send "#support" "Issue resolved, deploying fix now."
+discord-agent send "#support" "Issue resolved, deploying fix now."
 
 # 4. Acknowledge
-discord react <channelId> <messageId> "white_check_mark"
+discord-agent react <channelId> <messageId> "white_check_mark"
 ```
 
 The `--json` flag on `history` and `listen` outputs structured JSON suitable for programmatic consumption. The `listen --once` mode is designed for scheduled polling in agent heartbeat loops.
@@ -328,19 +357,19 @@ discord-agent-cli/
       format.ts                 # Table/timestamp formatters
       resolve-channel.ts        # #channel-name resolution
     commands/
-      doctor.ts                 # discord doctor
-      status.ts                 # discord status
-      guilds.ts                 # discord guilds
-      channels.ts               # discord channels
-      members.ts                # discord members
-      roles.ts                  # discord roles
-      send.ts                   # discord send
-      history.ts                # discord history
-      react.ts                  # discord react
-      pins.ts                   # discord pins
-      threads.ts                # discord threads
-      listen.ts                 # discord listen
-      webhook.ts                # discord webhook
+      doctor.ts                 # discord-agent doctor
+      status.ts                 # discord-agent status
+      guilds.ts                 # discord-agent guilds
+      channels.ts               # discord-agent channels
+      members.ts                # discord-agent members
+      roles.ts                  # discord-agent roles
+      send.ts                   # discord-agent send
+      history.ts                # discord-agent history
+      react.ts                  # discord-agent react
+      pins.ts                   # discord-agent pins
+      threads.ts                # discord-agent threads
+      listen.ts                 # discord-agent listen
+      webhook.ts                # discord-agent webhook
   dist/                         # Compiled output
   skills/
     discord-cli/
